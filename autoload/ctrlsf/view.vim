@@ -33,9 +33,9 @@ func! s:Ellipsis() abort
     return [repeat(".", 4)]
 endf
 
-func! s:Line(line) abort
+func! s:Line(line, indent) abort
     let out = a:line.lnum . (a:line.matched() ? ':' : '-')
-    let out .= repeat(' ', ctrlsf#view#Indent() - len(out))
+    let out .= repeat(' ', a:indent - len(out))
     let out .= a:line.content
     return [out]
 endf
@@ -47,13 +47,6 @@ func! s:LineCompact(match) abort
                 \ a:match.col,
                 \ a:match.text)
     return [out]
-endf
-
-" ctrlsf#view#Indent()
-"
-func! ctrlsf#view#Indent() abort
-    let maxlnum = ctrlsf#db#MaxLnum()
-    return strlen(string(maxlnum)) + 1 + g:ctrlsf_indent
 endf
 
 " Reset()
@@ -133,13 +126,14 @@ func! s:NormalViewIncr(base_vlnum) abort
             call extend(view, s:Ellipsis())
         endif
 
+        let indent = strlen(par.mlnum()) + 1 + g:ctrlsf_indent
         for line in par.lines
-            call extend(view, s:Line(line))
+            call extend(view, s:Line(line, indent))
 
             call line.set_vlnum(a:base_vlnum + len(view))
 
             if line.matched()
-                call line.match.set_vpos(line.vlnum(), line.match.col + ctrlsf#view#Indent())
+                call line.match.set_vpos(line.vlnum(), line.match.col + indent)
             endif
         endfo
     endfo
@@ -334,7 +328,6 @@ endf
 func! ctrlsf#view#Unrender(content) abort
     let lines  = type(a:content) == 3 ? a:content : split(a:content, "\n")
     let orig   = ctrlsf#db#ResultSet()
-    let indent = ctrlsf#view#Indent()
 
     let resultset = []
 
@@ -352,6 +345,7 @@ func! ctrlsf#view#Unrender(content) abort
         endif
         let orig_para = orig[len(resultset)]
         let base_lnum = orig_para.lnum()
+        let indent = strlen(orig_para.mlnum()) + 1 + g:ctrlsf_indent
 
         while i < len(lines)
             let line = lines[i]

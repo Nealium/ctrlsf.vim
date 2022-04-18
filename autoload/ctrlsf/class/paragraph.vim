@@ -17,6 +17,7 @@ func! ctrlsf#class#paragraph#New(buffer) abort
         \ 'filename'  : fname,
         \ 'lnum'      : function("ctrlsf#class#paragraph#Lnum"),
         \ 'vlnum'     : function("ctrlsf#class#paragraph#Vlnum"),
+        \ 'mlnum'     : function("ctrlsf#class#paragraph#MLnum"),
         \ 'range'     : function("ctrlsf#class#paragraph#Range"),
         \ 'lines'     : [],
         \ 'matches'   : function("ctrlsf#class#paragraph#Matches"),
@@ -42,6 +43,12 @@ endf
 func! ctrlsf#class#paragraph#Vlnum(...) abort dict
     let vmode = get(a:, 1, 'normal')
     return self.lines[0].vlnum(vmode)
+endf
+
+" MLnum()
+"
+func! ctrlsf#class#paragraph#MLnum() abort dict
+    return self.lines[-1].lnum
 endf
 
 " Range()

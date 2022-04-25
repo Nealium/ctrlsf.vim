@@ -423,12 +423,12 @@ endf
 " width/height of fixed sized windows such like NERDTree's.
 "
 func! ctrlsf#win#BackupAllWinSize()
-    try
+    if !(exists('g:ctrlsf_win_compatibility'))
       if !exists("t:ctrlsf_winrestcmd")
           let t:ctrlsf_winrestcmd = []
       endif
       call add(t:ctrlsf_winrestcmd, join(s:BuildResizeCmd(winlayout(), 0, 0), '|'))
-    catch
+    else
       let nr = 1
       while winbufnr(nr) != -1
           if getwinvar(nr, '&winfixwidth') || getwinvar(nr, '&winfixheight')
@@ -444,7 +444,7 @@ func! ctrlsf#win#BackupAllWinSize()
           endif
           let nr += 1
       endwh
-    endtry
+    endif
 endf
 
 func! s:BuildResizeCmd(layout, resize, vresize) abort

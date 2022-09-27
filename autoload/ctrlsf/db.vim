@@ -181,6 +181,8 @@ endf
 "
 func! ctrlsf#db#ParseBackendResultIncr(lines, close) abort
     for line in a:lines
+        " remove trailing <CR> of lines from win-style files
+        let line = substitute(line, "\r$", "", "")
         call s:ParseOneLine(line)
     endfo
 
@@ -204,7 +206,10 @@ func! s:ParseOneLine(line) abort
         call s:MakeParagraph()
         call s:ParseOneLine(a:line)
     else
-        if (s:pre_ln == -1) || (lnum == s:pre_ln + 1)
+        if ctrlsf#opt#IsContextZero()
+            call add(s:buffer, [fname, lnum, content])
+            call s:MakeParagraph()
+        elseif (s:pre_ln == -1) || (lnum == s:pre_ln + 1)
             let s:pre_ln = lnum
             call add(s:buffer, [fname, lnum, content])
         else
